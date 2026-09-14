@@ -39,17 +39,17 @@ class AttendanceService
 
         // 3. Simpan Transaksi Attendance
         return Attendance::create([
-            'user_id' => $user->id,
-            'location_id' => $data['location_id'],
-            'date' => $today,
-            'check_in' => $currentTime,
-            'check_in_latitude' => $data['latitude'],
-            'check_in_longitude' => $data['longitude'],
-            'check_in_distance' => $data['distance'],
-            'check_in_accuracy' => $data['accuracy'] ?? null,
-            'face_verification_status' => $data['face_verified'] ?? 'SKIPPED',
-            'status' => $status,
-            'notes' => $data['notes'] ?? null,
+            'user_id'                  => $user->id,
+            'location_id'              => $data['location_id'],
+            'date'                     => $today,
+            'check_in'                 => $currentTime,
+            'check_in_latitude'        => $data['latitude'],
+            'check_in_longitude'       => $data['longitude'],
+            'check_in_distance'        => $data['distance'],
+            'check_in_accuracy'        => $data['accuracy'] ?? null,
+            'face_verification_status' => $data['face_verification_status'] ?? ($data['face_verified'] ?? 'VERIFIED'),
+            'status'                   => $status,
+            'notes'                    => $data['notes'] ?? null,
         ]);
     }
 
@@ -79,12 +79,12 @@ class AttendanceService
         }
 
         $attendance->update([
-            'check_out' => $currentTime,
-            'check_out_latitude' => $data['latitude'],
+            'check_out'           => $currentTime,
+            'check_out_latitude'  => $data['latitude'],
             'check_out_longitude' => $data['longitude'],
-            'check_out_distance' => $data['distance'],
-            'check_out_accuracy' => $data['accuracy'] ?? null,
-            'status' => $status,
+            'check_out_distance'  => $data['distance'],
+            'check_out_accuracy'  => $data['accuracy'] ?? null,
+            'status'              => $status,
         ]);
 
         return $attendance;
