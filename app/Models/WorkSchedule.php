@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class WorkSchedule extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'start_time',
+        'end_time',
+        'break_start',
+        'break_end',
+        'tolerance_minutes',
+        'work_days',
+    ];
+
+    protected $casts = [
+        'work_days' => 'array',
+    ];
+}
