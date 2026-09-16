@@ -27,38 +27,26 @@ class AttendanceController extends Controller
             'location_id' => 'required|exists:employee_locations,id',
             'latitude'    => 'required|numeric',
             'longitude'   => 'required|numeric',
+            'face_image'  => 'required|image|mimes:jpeg,png,jpg|max:5048',
         ]);
 
         try {
-            // Evaluasi Jarak Radius (Location Service)
-            $location = \App\Models\EmployeeLocation::findOrFail($request->location_id);
-            $radiusCheck = $this->locationService->isWithinRadius(
-                $request->latitude,
-                $request->longitude,
-                $location->latitude,
-                $location->longitude,
-                $location->radius_meters
+            $attendance = $this->attendanceService->processIntegratedCheckIn(
+                $request->user(),
+                $request->all(),
+                $request->file('face_image')
             );
 
-            if (!$radiusCheck['is_valid']) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => "Posisi Anda ({$radiusCheck['distance']}m) melebihi radius lokasi yang diizinkan ({$radiusCheck['max_radius']}m).",
-                ], 400);
-            }
-
-            $attendance = $this->attendanceService->checkIn($request->user(), array_merge($request->all(), [
-                'distance' => $radiusCheck['distance']
-            ]));
-
             return response()->json([
-                'status' => 'success',
-                'message' => 'Check-in Berhasil',
-                'data' => $attendance
+                'status'  => 'success',
+                'message' => 'Check-in Berhasil! Absensi dan verifikasi wajah tercatat.',
+                'data'    => $attendance
             ], 200);
-
         } catch (Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage()
+            ], 400);
         }
     }
 
@@ -79,7 +67,6 @@ class AttendanceController extends Controller
                 'message' => 'Check-out Berhasil',
                 'data' => $attendance
             ], 200);
-
         } catch (Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 400);
         }
